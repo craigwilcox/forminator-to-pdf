@@ -1,4 +1,5 @@
 // src/app/api/convert/route.ts
+// Redeploy trigger: verify Vercel auto-builds from GitHub
 import { NextRequest, NextResponse } from "next/server";
 import { parseForminatorCSV } from "@/lib/csv-parser";
 import { generatePDFs } from "@/lib/pdf-generator";
