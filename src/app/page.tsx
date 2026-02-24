@@ -64,10 +64,10 @@ export default function Home() {
     <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
         <h1 className="text-2xl font-bold text-center text-gray-800">
-          Forminator CSV to PDF
+          CSV to PDF
         </h1>
         <p className="text-sm text-center text-gray-500">
-          Upload a Forminator survey CSV export to generate per-respondent PDFs.
+          Upload a CSV to generate per-row PDFs.
         </p>
 
         {/* Drop zone */}

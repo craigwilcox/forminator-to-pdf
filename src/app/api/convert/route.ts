@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
     }
 
     const csvText = await file.text();
-    const { headers, rows } = parseForminatorCSV(csvText);
+    const transform = request.nextUrl.searchParams.get("transform");
+    const { headers, rows } = parseForminatorCSV(csvText, {
+      skipTransform: transform !== "moores",
+    });
 
     if (rows.length === 0) {
       return NextResponse.json({ error: "CSV contains no data rows" }, { status: 400 });

@@ -62,7 +62,10 @@ function transformRows(
   return { headers: newHeaders, rows };
 }
 
-export function parseForminatorCSV(csvText: string): {
+export function parseForminatorCSV(
+  csvText: string,
+  { skipTransform = false }: { skipTransform?: boolean } = {}
+): {
   headers: string[];
   rows: Record<string, string>[];
 } {
@@ -72,7 +75,7 @@ export function parseForminatorCSV(csvText: string): {
 
   const [rawHeaders, ...rawRows] = parsed.data;
 
-  if (needsTransform(rawHeaders)) {
+  if (!skipTransform && needsTransform(rawHeaders)) {
     return transformRows(rawHeaders, rawRows);
   }
 
