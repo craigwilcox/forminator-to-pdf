@@ -107,10 +107,13 @@ The array should have one entry per corrected column, in the same order as the c
       }
     }
 
+    const titleColumn = (formData.get("titleColumn") as string)?.trim() || undefined;
+
     const config: TransformConfig = {
       slug,
       title,
       description: description || `Upload a CSV for ${title}`,
+      titleColumn,
       columns,
     };
 

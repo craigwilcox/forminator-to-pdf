@@ -20,13 +20,17 @@ function sanitizeFilename(text: string): string {
 
 function createPDF(
   headers: string[],
-  row: Record<string, string>
+  row: Record<string, string>,
+  titleColumn?: string
 ): ArrayBuffer {
   const doc = new jsPDF();
   let y = 20;
 
   const name =
-    row["Customer Name"]?.trim() || row[headers[0]] || "Survey Response";
+    (titleColumn ? row[titleColumn]?.trim() : null) ||
+    row["Customer Name"]?.trim() ||
+    row[headers[0]] ||
+    "Survey Response";
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
   doc.text(sanitizeText(name), 14, y);
@@ -67,12 +71,14 @@ function createPDF(
 
 export function generatePDFs(
   headers: string[],
-  rows: Record<string, string>[]
+  rows: Record<string, string>[],
+  titleColumn?: string
 ): { filename: string; data: ArrayBuffer }[] {
   return rows.map((row, i) => {
-    const name = row["Customer Name"]?.trim() || `row_${i + 1}`;
+    const nameCol = titleColumn || "Customer Name";
+    const name = row[nameCol]?.trim() || `row_${i + 1}`;
     const filename = `${sanitizeFilename(name)}.pdf`;
-    const data = createPDF(headers, row);
+    const data = createPDF(headers, row, titleColumn);
     return { filename, data };
   });
 }

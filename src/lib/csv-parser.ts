@@ -4,19 +4,27 @@ export function parseCSV(csvText: string): {
   headers: string[];
   rows: Record<string, string>[];
 } {
-  const parsed = Papa.parse<string[]>(csvText, {
-    skipEmptyLines: true,
-  });
-
-  const [rawHeaders, ...rawRows] = parsed.data;
+  const { headers, rawRows } = parseCSVRaw(csvText);
 
   const rows = rawRows.map((row) => {
     const record: Record<string, string> = {};
-    rawHeaders.forEach((h, i) => {
+    headers.forEach((h, i) => {
       record[h] = row[i] ?? "";
     });
     return record;
   });
 
-  return { headers: rawHeaders, rows };
+  return { headers, rows };
+}
+
+export function parseCSVRaw(csvText: string): {
+  headers: string[];
+  rawRows: string[][];
+} {
+  const parsed = Papa.parse<string[]>(csvText, {
+    skipEmptyLines: true,
+  });
+
+  const [headers, ...rawRows] = parsed.data;
+  return { headers, rawRows };
 }

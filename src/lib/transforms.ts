@@ -9,6 +9,7 @@ export interface TransformConfig {
   slug: string;
   title: string;
   description: string;
+  titleColumn?: string;
   columns: ColumnMapping[];
 }
 

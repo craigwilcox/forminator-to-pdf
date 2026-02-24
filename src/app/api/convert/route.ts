@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseCSV } from "@/lib/csv-parser";
+import { parseCSV, parseCSVRaw } from "@/lib/csv-parser";
 import { generatePDFs } from "@/lib/pdf-generator";
 import { getTransform } from "@/lib/transforms";
 import JSZip from "jszip";
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     let headers: string[];
     let rows: Record<string, string>[];
+    let titleColumn: string | undefined;
 
     if (transformSlug) {
       const config = await getTransform(transformSlug);
@@ -31,14 +32,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const parsed = parseCSV(csvText);
+      const parsed = parseCSVRaw(csvText);
 
       headers = config.columns.map((col) => col.outputName);
-      rows = parsed.rows.map((rawRow) => {
+      titleColumn = config.titleColumn;
+      rows = parsed.rawRows.map((rawRow) => {
         const record: Record<string, string> = {};
-        const rawValues = Object.values(rawRow);
         for (const col of config.columns) {
-          record[col.outputName] = rawValues[col.sourceIndex] ?? "";
+          record[col.outputName] = rawRow[col.sourceIndex] ?? "";
         }
         return record;
       });
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pdfs = generatePDFs(headers, rows);
+    const pdfs = generatePDFs(headers, rows, titleColumn);
 
     const zip = new JSZip();
     for (const pdf of pdfs) {
