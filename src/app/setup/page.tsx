@@ -39,22 +39,25 @@ export default function SetupPage() {
       formData.append("title", title);
       formData.append("description", description);
 
-      const res = await fetch("/api/setup", { method: "POST", body: formData });
+      const res = await fetch("/api/setup?action=generate", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         throw new Error(body?.error ?? "Setup failed");
       }
 
-      const config = await res.json();
-      setColumns(config.columns);
+      const data = await res.json();
+      setColumns(data.columns);
       // Default to first column that looks like a name field
-      const nameCol = config.columns.find(
+      const nameCol = data.columns.find(
         (c: ColumnMapping) =>
           c.outputName.toLowerCase().includes("name") ||
           c.outputName.toLowerCase().includes("customer")
       );
-      setTitleColumn(nameCol?.outputName || config.columns[0]?.outputName || "");
+      setTitleColumn(nameCol?.outputName || data.columns[0]?.outputName || "");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -63,21 +66,23 @@ export default function SetupPage() {
   };
 
   const handleSaveWithTitle = async () => {
-    if (!titleColumn || !rawCsv || !correctedCsv) return;
+    if (!titleColumn || !columns) return;
 
     setSaving(true);
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("rawCsv", rawCsv);
-      formData.append("correctedCsv", correctedCsv);
-      formData.append("slug", slug);
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("titleColumn", titleColumn);
-
-      const res = await fetch("/api/setup", { method: "POST", body: formData });
+      const res = await fetch("/api/setup?action=save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug,
+          title,
+          description,
+          titleColumn,
+          columns,
+        }),
+      });
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);

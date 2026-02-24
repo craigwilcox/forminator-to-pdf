@@ -5,24 +5,26 @@ import { saveTransform, TransformConfig } from "@/lib/transforms";
 
 const anthropic = new Anthropic();
 
+// POST /api/setup?action=generate — call Claude to generate column mapping
+// POST /api/setup?action=save — save the config to KV (no AI call)
 export async function POST(request: NextRequest) {
+  const action = request.nextUrl.searchParams.get("action") || "generate";
+
+  if (action === "save") {
+    return handleSave(request);
+  }
+  return handleGenerate(request);
+}
+
+async function handleGenerate(request: NextRequest) {
   try {
     const formData = await request.formData();
     const rawCsvFile = formData.get("rawCsv") as File | null;
     const correctedCsvFile = formData.get("correctedCsv") as File | null;
-    const slug = (formData.get("slug") as string)?.trim();
-    const title = (formData.get("title") as string)?.trim();
-    const description = (formData.get("description") as string)?.trim();
 
     if (!rawCsvFile || !correctedCsvFile) {
       return NextResponse.json(
         { error: "Both raw and corrected CSV files are required" },
-        { status: 400 }
-      );
-    }
-    if (!slug || !title) {
-      return NextResponse.json(
-        { error: "Slug and title are required" },
         { status: 400 }
       );
     }
@@ -107,13 +109,39 @@ The array should have one entry per corrected column, in the same order as the c
       }
     }
 
-    const titleColumn = (formData.get("titleColumn") as string)?.trim() || undefined;
+    return NextResponse.json({ columns });
+  } catch (error) {
+    console.error("Setup generate error:", error);
+    return NextResponse.json(
+      { error: "Failed to generate transform" },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleSave(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { slug, title, description, titleColumn, columns } = body;
+
+    if (!slug || !title) {
+      return NextResponse.json(
+        { error: "Slug and title are required" },
+        { status: 400 }
+      );
+    }
+    if (!Array.isArray(columns) || columns.length === 0) {
+      return NextResponse.json(
+        { error: "Columns are required" },
+        { status: 400 }
+      );
+    }
 
     const config: TransformConfig = {
       slug,
       title,
       description: description || `Upload a CSV for ${title}`,
-      titleColumn,
+      titleColumn: titleColumn || undefined,
       columns,
     };
 
@@ -121,9 +149,9 @@ The array should have one entry per corrected column, in the same order as the c
 
     return NextResponse.json(config);
   } catch (error) {
-    console.error("Setup error:", error);
+    console.error("Setup save error:", error);
     return NextResponse.json(
-      { error: "Failed to generate transform" },
+      { error: "Failed to save transform" },
       { status: 500 }
     );
   }
