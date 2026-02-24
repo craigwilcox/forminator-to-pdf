@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Forminator CSV to PDF",
-  description: "Convert Forminator survey CSV exports into per-respondent PDFs.",
+  title: "Simplur CSV to PDF",
+  description: "Convert CSV exports into per-row PDFs.",
 };
 
 export default function RootLayout({
