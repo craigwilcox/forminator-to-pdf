@@ -64,11 +64,11 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+        Simplur CSV to PDF
+      </h1>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800">
-          Simplur CSV to PDF
-        </h1>
         <p className="text-sm text-center text-gray-500">
           Upload a CSV to generate per-row PDFs.
         </p>
