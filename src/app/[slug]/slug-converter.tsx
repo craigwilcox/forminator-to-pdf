@@ -2,7 +2,15 @@
 
 import { useState, useRef } from "react";
 
-export default function MooresPage() {
+export function SlugConverter({
+  slug,
+  title,
+  description,
+}: {
+  slug: string;
+  title: string;
+  description: string;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +46,7 @@ export default function MooresPage() {
       const formData = new FormData();
       formData.append("csv", file);
 
-      const res = await fetch("/api/convert?transform=moores", {
+      const res = await fetch(`/api/convert?transform=${slug}`, {
         method: "POST",
         body: formData,
       });
@@ -67,13 +75,10 @@ export default function MooresPage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6">
         <h1 className="text-2xl font-bold text-center text-gray-800">
-          Moores Survey CSV to PDF
+          {title}
         </h1>
-        <p className="text-sm text-center text-gray-500">
-          Upload a Forminator survey CSV export to generate per-respondent PDFs.
-        </p>
+        <p className="text-sm text-center text-gray-500">{description}</p>
 
-        {/* Drop zone */}
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
@@ -96,7 +101,6 @@ export default function MooresPage() {
           )}
         </div>
 
-        {/* Convert button */}
         <button
           onClick={handleConvert}
           disabled={!file || loading}
@@ -105,7 +109,6 @@ export default function MooresPage() {
           {loading ? "Converting..." : "Convert & Download ZIP"}
         </button>
 
-        {/* Status messages */}
         {error && (
           <p className="text-sm text-center text-red-500">{error}</p>
         )}
@@ -115,7 +118,6 @@ export default function MooresPage() {
           </p>
         )}
 
-        {/* Hidden download link */}
         <a ref={downloadRef} className="hidden" />
       </div>
     </main>

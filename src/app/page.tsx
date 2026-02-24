@@ -38,7 +38,10 @@ export default function Home() {
       const formData = new FormData();
       formData.append("csv", file);
 
-      const res = await fetch("/api/convert", { method: "POST", body: formData });
+      const res = await fetch("/api/convert", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
