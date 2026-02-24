@@ -117,6 +117,14 @@ export default function Home() {
 
         {/* Hidden download link */}
         <a ref={downloadRef} className="hidden" />
+
+        <p className="text-sm text-center text-gray-500">
+          Do you need to automatically transform your CSV column headers before
+          making the PDF?{" "}
+          <a href="/setup" className="text-blue-600 hover:underline">
+            Let&apos;s give it the old AI try.
+          </a>
+        </p>
       </div>
     </main>
   );
